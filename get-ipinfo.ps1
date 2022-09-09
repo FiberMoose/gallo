@@ -42,7 +42,11 @@ function ValidateIP ($varIP) {
 
 if ($varIP -ne $null) {
     if (ValidateIP ($varIP)) {
-    #IP Validated!, do further tasks
+    $varHops = (Test-NetConnection -TraceRoute -ComputerName $varIP).traceroute.count
+    $varPing = (Test-Connection $varIP -count 10).ResponseTime | Measure-Object -Average
+    $varPingAvg = $varPing.Average
+    
+    
 
     }
 } else {
