@@ -27,10 +27,25 @@ $varIP = ${IP Address}
 
 
 function ValidateIP ($varIP) {
-    #Not null, continue
+    if ($varIP -match "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$" -and [bool]($varIP -as [ipaddress]) -and !($varIP -Match '(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)')) {
+        $true | out-null
+    } else {
+        if (!($varIP -match "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")) {
+            write-host "ERROR! You provided an invalid IP Address! `nYou provided: "$varIP
+        } elseif ($varIP -Match '(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)') {
+            write-host "ERROR! You provided an non internet-routable ip address! `nYou provided: "$varIP
+        }
+        $false | out-null
+        #exit 1    #Commented out for testing
+    }
+}
 
+if ($varIP -ne $null) {
+    if (ValidateIP ($varIP)) {
+    #IP Validated!, do further tasks
 
+    }
 } else {
-    Write-host "Error! IP Parameter was null!"
+    Write-host "#####`nERROR! NO IP Address has been provided. `nPlease supply an IP through script parameter or when prompted.`n#####" -ForegroundColor red
     #exit 1      #Commented out for testing
 }
