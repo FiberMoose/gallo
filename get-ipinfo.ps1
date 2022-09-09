@@ -42,11 +42,12 @@ function ValidateIP ($varIP) {
 
 if ($varIP -ne $null) {
     if (ValidateIP ($varIP)) {
-    $varHops = (Test-NetConnection -TraceRoute -ComputerName $varIP).traceroute.count
-    $varPing = (Test-Connection $varIP -count 10).ResponseTime | Measure-Object -Average
-    $varPingAvg = $varPing.Average
-    
-    
+        $varHops = (Test-NetConnection -TraceRoute -ComputerName $varIP).traceroute.count
+        $varPing = (Test-Connection $varIP -count 10).ResponseTime | Measure-Object -Average
+        $varPingAvg = $varPing.Average
+
+        write-host "Network tests indicate there are $varHops network hops with an average packet latency of $varPingAvg ms between this host and the Supplied IP $varIP"
+
 
     }
 } else {
