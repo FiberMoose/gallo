@@ -18,5 +18,13 @@ get-ipinfo.ps1 -ip 1.1.1.1
 Github Repo:  https://github.com/fibermoose/gallo/
 #>
 
+param (
+    [Parameter(Position = 0, Mandatory, HelpMessage = 'Please provide a valid internet routable IP Address to query')]
+    [Alias("IP")]
+    [string]${IP Address}
+)
+$varIP = ${IP Address}
+
+
 #TODO: everything
 
