@@ -26,5 +26,11 @@ param (
 $varIP = ${IP Address}
 
 
-#TODO: everything
+function ValidateIP ($varIP) {
+    #Not null, continue
 
+
+} else {
+    Write-host "Error! IP Parameter was null!"
+    #exit 1      #Commented out for testing
+}
