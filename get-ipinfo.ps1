@@ -88,8 +88,8 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
 
     } else {
         Write-host "Error! We were not able to reach" $varIP
-        $varPingAvg = "Error! $varIP not reachable"
-        $varHops = "Error! $varIP not reachable"      
+        $varPingAvg = "Error: Ping failed"
+        $varHops = "Error: Traceroute failed"
     }
 
     $header = @{"Accept" = "application/xml" }
