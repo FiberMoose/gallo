@@ -1,19 +1,27 @@
 <#
 .SYNOPSIS 
-Accepts an IP Address with validation, then queries IP Information.
+Accepts an IPv4 Address with validation, then queries IP Information.
 
 .DESCRIPTION
-Accepts an IP Address with validation, then:
+Accepts an IPv4 Address with validation, then:
 Counts hops between the supplied IP and script host
 Measures average latency between IP and script host
-Queries Whois, geoIP, ASN info, as well as enviormental information local to the IP GeoIP location.
+Queries Whois, geoIP, ASN info, as well as weather information local to the IP GeoIP location.
 
 .PARAMETER IP
-Specifies the IP Address to query
+Mandatory, Specifies the IP Address to query. 
+If not provided, the script prompt for it.
+MANDATORY if using the json parameter.
+
+.PARAMETER JSON
+Optional, Directs all script output to json format, mutes human friendly console output
+-IP Parameter MANDATORY when using the json switch
 
 .EXAMPLE 
-get-ipinfo.ps1 -ip 1.1.1.1
-get-ipinfo.ps1 -ip 1.1.1.1 -json
+.\get-ipinfo.ps1 -ip 1.1.1.1
+
+.EXAMPLE
+.\get-ipinfo.ps1 -ip 1.1.1.1 -json
 
 .LINK
 Github Repo:  https://github.com/fibermoose/gallo/
@@ -29,27 +37,45 @@ param (
 )
 $varIP = ${IP Address}
 
-function ValidateIP {  #IP Validation function
+function ValidateIP {
+    #IP Validation function
     param([string]$varIPValidate)
     [bool](($varIP -match "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" -and [bool]($varIPValidate -as [ipaddress]) -and !($varIPValidate -Match '(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)')))
 }
 
+function ValidateIPDescriptive {
+    param([string]$varIPValidate)
+    if ($varIPValidate -Match ":(?::[a-f\d]{1,4}){0,5}(?:(?::[a-f\d]{1,4}){1,2}|:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})))|[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}|:)|(?::(?:[a-f\d]{1,4})?|(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))))|:(?:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|[a-f\d]{1,4}(?::[a-f\d]{1,4})?|))|(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|:[a-f\d]{1,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){0,2})|:))|(?:(?::[a-f\d]{1,4}){0,2}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,3}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))") {
+        #Check if iP is valid IPv4
+        "ERROR: IPv6 Address provided. Unsupported in this revision."
+    } elseif ($varIPValidate -Match "(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)") {
+        #Check if IP not a private non-routable
+        "ERROR: Non-routable IPv4 Address provided."
+    } elseif (!($varIPValidate -match "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")) {
+        #Check if IP is an IPv6
+        "ERROR: Invalid IPv4 Address provided."
+    } else {
+        "ERROR: Invalid Address provided"
+    }
+}
+
 if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
-    if ($json) { #check if the $json switch is set to true
-        function write-host { #If $json = true, overide write-host to output nothing ($null)
+    if ($json) {
+        #check if the $json switch is set to true
+        function write-host {
+            #If $json = true, overide write-host to output nothing ($null)
             $null
         }
-    } else {
-        write-output "DEBUG: Optional json output flag not detected"
     }
 
-    write-host "A valid routable IP was Supplied!" $varIPValidate
+    write-host "A valid routable IPv4 address was Supplied!" $varIPValidate
     
     write-host "Verifying if $varIP is currently responding to ICMP requests`n"
     if (Test-connection $varIP -count 1) {
         write-host "Success!`nPlease wait while we run a traceroute and ping test...`n"
         $varHops = (Test-NetConnection -TraceRoute -ComputerName $varIP).traceroute.count #Measure hops between script host and IP
-        if ($PSVersionTable.PSVersion.major -gt "5") { #Workaround for changes in Test-Connection sytax post Powershell Version 5.1
+        if ($PSVersionTable.PSVersion.major -gt "5") {
+            #Workaround for changes in Test-Connection sytax post Powershell Version 5.1
             $varPingProperty = "Latency"
         } else {
             $varPingProperty = "ResponseTime"
@@ -62,6 +88,8 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
 
     } else {
         Write-host "Error! We were not able to reach" $varIP
+        $varPingAvg = "Error! $varIP not reachable"
+        $varHops = "Error! $varIP not reachable"      
     }
 
     $header = @{"Accept" = "application/xml" }
@@ -87,10 +115,12 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         write-host "The returned response was: " $varWhois
     }
         
-    if ($json) { #IF Json script parameter is set to true
+    if ($json) {
+        #IF Json script parameter is set to true
         $varjsondata = [PSCustomObject]@{
-            IPAddress    = "$($varIP)"
-            Network_Tests  = @(
+            IPAddress     = "$($varIP)"
+            ERROR         = "$($varHops)"
+            Network_Tests = @(
                 @{
                     Query  = "Number of hops from $($env:computername) to $($varIP)."
                     Result = "$($varHops)"
@@ -100,7 +130,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
                     Result = "$($varPingAvg)"
                 }
             )
-            IP_Whois     = @(
+            IP_Whois      = @(
                 @{
                     Query  = "Netblock owner, ASN, ASN owner, and ISP"
                     Result = @{
@@ -121,7 +151,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
                     }
                 }
             )
-            Weather      = @(
+            Weather       = @(
                 @{
                     Query  = "Local weather Temperature and Humidity"
                     Result = @{
@@ -134,7 +164,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
                     }
                 }
             )
-            Date_Time    = @(
+            Date_Time     = @(
                 @{
                     Query  = "Local date and time"
                     Result = @{
@@ -151,13 +181,15 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
     }
     exit 0
     
-} else {  #Detailed input validation error reporting
-    if (!($varIP -match "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")) { #Check if IP is valid
-        Write-host "Error! You provided an invalid IP Address! `nYou provided: $varIP"
-    } elseif ($varIP -Match '(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)') { #Check if IP not a private non-routable
-        Write-host "Error! You provided an non internet-routable ip address! `nYou provided: $varIP"
-    } else {
-        write-host "Error! You provided an IP address of $varIP that was not able to be validated!"
+} elseif ($json) {
+    $varjsondata = [PSCustomObject]@{
+        IPAddress = "$($varIP)"
+        ERROR     = "$(ValidateIPDescriptive ($varIP))"
     }
+    ConvertTo-Json -InputObject $varjsondata
+
+} else {
+    #Detailed input validation error reporting
+    ValidateIPDescriptive ($varIP)
     exit 1
 }
