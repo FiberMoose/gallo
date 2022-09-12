@@ -90,6 +90,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         Write-host "Error! We were not able to reach" $varIP
         $varPingAvg = "Error: Ping failed"
         $varHops = "Error: Traceroute failed"
+        $VarIPTestsError = "ERROR: Ping or Traceroute failed!"
     }
 
     $header = @{"Accept" = "application/xml" }
@@ -119,7 +120,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         #IF Json script parameter is set to true
         $varjsondata = [PSCustomObject]@{
             IPAddress     = "$($varIP)"
-            ERROR         = "$($varHops)"
+            ERROR         = "$($VarIPTestsError)"
             Network_Tests = @(
                 @{
                     Query  = "Number of hops from $($env:computername) to $($varIP)."
