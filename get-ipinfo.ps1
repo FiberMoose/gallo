@@ -37,21 +37,27 @@ param (
 )
 $varIP = ${IP Address}
 
+#Define IP Regex in variables
+$varIPv4PrivateRegex = "(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)"
+$varIPv4ValidRegex = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+$varIPv6Regex = ":(?::[a-f\d]{1,4}){0,5}(?:(?::[a-f\d]{1,4}){1,2}|:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})))|[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}|:)|(?::(?:[a-f\d]{1,4})?|(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))))|:(?:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|[a-f\d]{1,4}(?::[a-f\d]{1,4})?|))|(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|:[a-f\d]{1,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){0,2})|:))|(?:(?::[a-f\d]{1,4}){0,2}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,3}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))"
+
+
 function ValidateIP {
     #IP Validation function
     param([string]$varIPValidate)
-    [bool](($varIP -match "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" -and [bool]($varIPValidate -as [ipaddress]) -and !($varIPValidate -Match '(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)')))
+    [bool](($varIP -match $varIPv4ValidRegex -and [bool]($varIPValidate -as [ipaddress]) -and !($varIPValidate -Match $varIPv4PrivateRegex)))
 }
 
 function ValidateIPDescriptive {
     param([string]$varIPValidate)
-    if ($varIPValidate -Match ":(?::[a-f\d]{1,4}){0,5}(?:(?::[a-f\d]{1,4}){1,2}|:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})))|[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}:(?:[a-f\d]{1,4}|:)|(?::(?:[a-f\d]{1,4})?|(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))))|:(?:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|[a-f\d]{1,4}(?::[a-f\d]{1,4})?|))|(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|:[a-f\d]{1,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){0,2})|:))|(?:(?::[a-f\d]{1,4}){0,2}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,3}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))|(?:(?::[a-f\d]{1,4}){0,4}(?::(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[a-f\d]{1,4}){1,2})|:))") {
+    if ($varIPValidate -Match $varIPv6Regex) {
         #Check if iP is an IPv6 address
         "ERROR: IPv6 Address provided. Unsupported in this revision."
-    } elseif ($varIPValidate -Match "(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)") {
+    } elseif ($varIPValidate -Match $varIPv4PrivateRegex) {
         #Check if IP is a private non-routable
         "ERROR: Non-routable IPv4 Address provided."
-    } elseif (!($varIPValidate -match "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")) {
+    } elseif (!($varIPValidate -match $varIPv4ValidRegex)) {
         #Check if IP is a valid formatted IPv4 IP Address
         "ERROR: Invalid IPv4 Address provided."
     } else {
@@ -118,74 +124,47 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         
     if ($json) {
         #IF Json script parameter is set to true
-        $varjsondata = [PSCustomObject]@{
-            IPAddress     = "$($varIP)"
-            ERROR         = "$($VarIPTestsError)"
-            Network_Tests = @(
-                @{
-                    Query  = "Number of hops from $($env:computername) to $($varIP)."
-                    Result = "$($varHops)"
-                },
-                @{
-                    Query  = "Average latency of 10 ICMP packets to $($varIP) in milliseconds"
-                    Result = "$($varPingAvg)"
-                }
-            )
-            IP_Whois      = @(
-                @{
-                    Query  = "Netblock owner, ASN, ASN owner, and ISP"
-                    Result = @{
-                        Netblock_Owner = "$($varWhois.org)"
-                        ASN            = "$(($varWhois.as).Split(' ')[0])"
-                        ASN_Owner      = "$((($varWhois.as) -split ' ',2)[-1])"
-                        ISP            = "$($varWhois.isp)"
-                    }
-                }   
-            )
-            IPGeoLocation = @(
-                @{
-                    Query  = "IP GeoLocation data"
-                    Result = @{
-                        City    = "$($varWhois.City)"
-                        Region  = "$($varWhois.region)"
-                        Country = "$($varWhois.country)"
-                    }
-                }
-            )
-            Weather       = @(
-                @{
-                    Query  = "Local weather Temperature and Humidity"
-                    Result = @{
-                        Temperature_c = "$($varGeoWeather.current.temp_c)"
-                        Temperature_f = "$($varGeoWeather.current.temp_f)"
-                        Humidity      = "$($varGeoWeather.current.humidity)"
-                        Windspeed     = "$($varGeoWeather.current.wind_mph)"
-                        Condition     = "$($varGeoWeather.current.condition.text)"
-
-                    }
-                }
-            )
-            Date_Time     = @(
-                @{
-                    Query  = "Local date and time"
-                    Result = @{
-                        Time_24_HHmm    = "$($varGeoLocalTime24)"
-                        Time_12_hhmm_tt = "$($varGeoLocalTime12)"
-                        Date_yyyy_mm_dd = "$(($varGeoWeather.location.localtime).Split(' ')[0])"
-                        TimeZone_ID     = "$($varGeoWeather.location.tz_id)"
-                    }
-                }
-            )
+        $varjsondata = @{
+            'IPAddress'     = "$($varIP)"
+            'ERROR'         = "$($VarIPTestsError)"
+            'Network_Tests' = @{
+                'Hops'        = "$($varHops)"
+                'Latency_avg' = "$($varPingAvg)"
+            }
+            'IP_Whois'      = @{
+                'Netblock_Owner' = "$($varWhois.org)"
+                'ASN'            = "$(($varWhois.as).Split(' ')[0])"
+                'ASN_Owner'      = "$((($varWhois.as) -split ' ',2)[-1])"
+                'ISP'            = "$($varWhois.isp)"
+            }
+            'IPGeoLocation' = @{
+                'City'    = "$($varWhois.City)"
+                'Region'  = "$($varWhois.region)"
+                'Country' = "$($varWhois.country)"
+            }
+            'Weather'       = @{
+                'Temperature_c' = "$($varGeoWeather.current.temp_c)"
+                'Temperature_f' = "$($varGeoWeather.current.temp_f)"
+                'Humidity'      = "$($varGeoWeather.current.humidity)"
+                'Windspeed'     = "$($varGeoWeather.current.wind_mph)"
+                'Condition'     = "$($varGeoWeather.current.condition.text)"
+            }
+            'Date_Time'     = @{
+                'Time_24_HHmm'    = "$($varGeoLocalTime24)"
+                'Time_12_hhmm_tt' = "$($varGeoLocalTime12)"
+                'Date_yyyy_mm_dd' = "$(($varGeoWeather.location.localtime).Split(' ')[0])"
+                'TimeZone_ID'     = "$($varGeoWeather.location.tz_id)"
+            }
         }
-        ConvertTo-Json -InputObject $varjsondata -Depth 3   #Output json data
+        ConvertTo-Json -InputObject $varjsondata -Depth 2   #Output json data
         Remove-Item -Path Function:\write-host  #Cleanup write-host output disable trick
     }
     exit 0
     
 } elseif ($json) {
-    $varjsondata = [PSCustomObject]@{
-        IPAddress = "$($varIP)"
-        ERROR     = "$(ValidateIPDescriptive ($varIP))"
+    $varjsondata = @{
+        'IPAddress' = "$($varIP)"
+        'ERROR'     = "$(ValidateIPDescriptive ($varIP))"
     }
     ConvertTo-Json -InputObject $varjsondata
 
