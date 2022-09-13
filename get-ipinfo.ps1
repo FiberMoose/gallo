@@ -37,6 +37,8 @@ param (
 )
 $varIP = ${IP Address}
 
+$ErrorActionPreference = "silentlycontinue"
+
 #Define IP Regex in variables
 $varIPv4PrivateRegex = "(^127\.)|(^192\.168\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)"
 $varIPv4ValidRegex = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
@@ -61,7 +63,7 @@ function ValidateIPDescriptive {
         #Check if IP is a valid formatted IPv4 IP Address
         "ERROR: Invalid IPv4 Address provided."
     } else {
-        "ERROR: Invalid Address provided"
+        "ERROR: Invalid Address provided" 
     }
 }
 
@@ -74,11 +76,11 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         }
     }
 
-    write-host "A valid routable IPv4 address was Supplied!" $varIPValidate
+    write-host "`nA valid routable IPv4 address was Supplied!" $varIPValidate
     
     write-host "Verifying if $varIP is currently responding to ICMP requests`n"
     if (Test-connection $varIP -count 1) {
-        write-host "Success!`nPlease wait while we run a traceroute and ping test...`n"
+        write-host "Success!`nPlease wait while we run a traceroute and ping test...`n" -ForegroundColor green
         $varHops = (Test-NetConnection -TraceRoute -ComputerName $varIP).traceroute.count #Measure hops between script host and IP
         if ($PSVersionTable.PSVersion.major -gt "5") {
             #Workaround for changes in Test-Connection sytax post Powershell Version 5.1
@@ -93,7 +95,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         write-host "The average packet latency is $varPingAvg ms.`n"
 
     } else {
-        Write-host "Error! We were not able to reach" $varIP
+        Write-host "Error! We were not able to reach" $varIP "`n"-ForegroundColor red
         $varPingAvg = "Error: Ping failed"
         $varHops = "Error: Traceroute failed"
         $varIPTestsError = "ERROR: Ping and or Traceroute failed! "
@@ -118,7 +120,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         write-host "    A humidity of"$varGeoWeather.current.humidity "%"
         write-host "    A Windspeed of"$varGeoWeather.current.wind_mph"mph"
     } else {
-        Write-host "There was a problem querying Whois Information"
+        Write-host "There was a problem querying Whois Information" -ForegroundColor red
         write-host "The returned response was: " $varWhois
         $varWhoisError = "ERROR: Whois query failed."
     }
