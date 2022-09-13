@@ -10,7 +10,7 @@ Queries Whois, geoIP, ASN info, as well as weather information local to the IP G
 
 .PARAMETER IP
 Mandatory, Specifies the IP Address to query. 
-If not provided, the script prompt for it.
+If not provided, the script will prompt for it.
 MANDATORY if using the json parameter.
 
 .PARAMETER JSON
