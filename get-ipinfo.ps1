@@ -104,7 +104,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
     if (($varWhois.status -eq "success") -and ($varWhois.query -eq $varIP)) {
         $varWhoisLocation = $varWhois.City + ", " + $varWhois.Region + ", " + $varWhois.country
         $varGeoWeather = Invoke-RestMethod -Method Get -Uri ("http://api.weatherapi.com/v1/current.json?key=c90129e9d8c843869b350836221009&q=" + $varWhoisLocation) -Headers $header
-        $varGeoLocalTime24 = ($varGeoWeather.location.localtime).Split(' ')[1]
+        $varGeoLocalTime24 = ([string]($varGeoWeather.location.localtime).Split(' ')[1].PadLeft(5,'0'))
         $varSplit = (([datetime]::ParseExact($varGeoLocalTime24, 'HH:mm', $null)).ToString()).Split(" ")
         $varGeoLocalTime12 = [string]$varSplit[1..($varSplit.count - 1)]
 
@@ -162,7 +162,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         ConvertTo-Json -InputObject $varjsondata -Depth 2   #Output json data
         Remove-Item -Path Function:\write-host  #Cleanup write-host output disable trick
     }
-    exit 0
+    #exit 0
     
 } elseif ($json) {
     $varjsondata = @{
@@ -174,5 +174,5 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
 } else {
     #Detailed input validation error reporting
     ValidateIPDescriptive ($varIP)
-    exit 1
+    #exit 1
 }
