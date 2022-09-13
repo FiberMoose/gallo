@@ -10,7 +10,7 @@ Queries Whois, geoIP, ASN info, as well as weather information local to the IP G
 
 .PARAMETER IP
 Mandatory, Specifies the IP Address to query. 
-If not provided, the script prompt for it.
+If not provided, the script will prompt for it.
 MANDATORY if using the json parameter.
 
 .PARAMETER JSON
@@ -96,7 +96,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         Write-host "Error! We were not able to reach" $varIP
         $varPingAvg = "Error: Ping failed"
         $varHops = "Error: Traceroute failed"
-        $VarIPTestsError = "ERROR: Ping or Traceroute failed!"
+        $varIPTestsError = "ERROR: Ping and or Traceroute failed! "
     }
 
     $header = @{"Accept" = "application/xml" }
@@ -104,7 +104,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
     if (($varWhois.status -eq "success") -and ($varWhois.query -eq $varIP)) {
         $varWhoisLocation = $varWhois.City + ", " + $varWhois.Region + ", " + $varWhois.country
         $varGeoWeather = Invoke-RestMethod -Method Get -Uri ("http://api.weatherapi.com/v1/current.json?key=c90129e9d8c843869b350836221009&q=" + $varWhoisLocation) -Headers $header
-        $varGeoLocalTime24 = ($varGeoWeather.location.localtime).Split(' ')[1]
+        $varGeoLocalTime24 = ([string]($varGeoWeather.location.localtime).Split(' ')[1].PadLeft(5,'0'))
         $varSplit = (([datetime]::ParseExact($varGeoLocalTime24, 'HH:mm', $null)).ToString()).Split(" ")
         $varGeoLocalTime12 = [string]$varSplit[1..($varSplit.count - 1)]
 
@@ -120,13 +120,16 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
     } else {
         Write-host "There was a problem querying Whois Information"
         write-host "The returned response was: " $varWhois
+        $varWhoisError = "ERROR: Whois query failed."
     }
-        
+
+    $varErrors = $varIPTestsError + $varWhoisError
+
     if ($json) {
         #IF Json script parameter is set to true
         $varjsondata = @{
             'IPAddress'     = "$($varIP)"
-            'ERROR'         = "$($VarIPTestsError)"
+            'ERROR'         = "$($varErrors)"
             'Network_Tests' = @{
                 'Hops'        = "$($varHops)"
                 'Latency_avg' = "$($varPingAvg)"
@@ -159,7 +162,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         ConvertTo-Json -InputObject $varjsondata -Depth 2   #Output json data
         Remove-Item -Path Function:\write-host  #Cleanup write-host output disable trick
     }
-    exit 0
+    #exit 0
     
 } elseif ($json) {
     $varjsondata = @{
@@ -171,5 +174,5 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
 } else {
     #Detailed input validation error reporting
     ValidateIPDescriptive ($varIP)
-    exit 1
+    #exit 1
 }
