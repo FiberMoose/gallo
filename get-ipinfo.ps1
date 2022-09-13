@@ -96,7 +96,7 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
         Write-host "Error! We were not able to reach" $varIP
         $varPingAvg = "Error: Ping failed"
         $varHops = "Error: Traceroute failed"
-        $VarIPTestsError = "ERROR: Ping or Traceroute failed!"
+        $varIPTestsError = "ERROR: Ping and or Traceroute failed! "
     }
 
     $header = @{"Accept" = "application/xml" }
@@ -120,13 +120,16 @@ if (($varIP -ne $null) -and (ValidateIP ($varIP) -eq $true)) {
     } else {
         Write-host "There was a problem querying Whois Information"
         write-host "The returned response was: " $varWhois
+        $varWhoisError = "ERROR: Whois query failed."
     }
-        
+
+    $varErrors = $varIPTestsError + $varWhoisError
+
     if ($json) {
         #IF Json script parameter is set to true
         $varjsondata = @{
             'IPAddress'     = "$($varIP)"
-            'ERROR'         = "$($VarIPTestsError)"
+            'ERROR'         = "$($varErrors)"
             'Network_Tests' = @{
                 'Hops'        = "$($varHops)"
                 'Latency_avg' = "$($varPingAvg)"
