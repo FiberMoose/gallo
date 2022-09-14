@@ -42,7 +42,7 @@ powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 8.8.8.8 -json"   #Tes
 powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 2600:3c01::f03c:91ff:fe93:48f8"   #Test valid public ipv6
 powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 2a03:2880:f12f:83:face:b00c::25de -json"   #Test valid public ipv6 with json
 ```
-__Test Validating public IP Validation:__
+__Test valid but private IP behavior:__
 ```
 powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 172.16.1.1"   #Test with private ipv4 
 powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 192.168.1.1 -json"   #Test valid private ipv4 with json
