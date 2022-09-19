@@ -1,5 +1,5 @@
 # (RPA SaaS Interview challenge)aaS
-This is a github repo setup as part of an interview challenge at a poultry-based startup.
+This is a github repo setup as part of an interview challenge at a poultry-themed startup.
 
 # Usage
 ### 1. Basic interactive usage
