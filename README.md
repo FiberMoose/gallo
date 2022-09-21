@@ -2,38 +2,28 @@
 This is a github repo setup as part of an interview challenge at a poultry-themed startup.
 
 # Usage
-### 1. Basic interactive usage
-__Note:__ If the -ip parameter is not provided, you will be prompted for it at execution
-
-From a command prompt:
+### 1. Download the script
+__From a PowerShell prompt:__
 ```
-C:\Temp\>powershell -ep bypass -c ". .\get-ipinfo.ps1 -ip 1.1.1.1"
-```
-
-From a PowerShell prompt:
-```
-PS C:\Temp\> Set-ExecutionPolicy Bypass -Scope process -Force
-PS C:\Temp\> . .\get-ipinfo.ps1 -ip 1.1.1.1
-```
-
-### 2. Json-only output mode
-
-From a command prompt:
-```
-C:\Temp\>powershell -ep bypass -c ". .\get-ipinfo.ps1 -ip 1.1.1.1 -json"
-```
-
-From a PowerShell prompt:
-```
-PS C:\Temp\> Set-ExecutionPolicy Bypass -Scope process -Force
-PS C:\Temp\> . .\get-ipinfo.ps1 -ip 1.1.1.1 -json
-```
-
-### 3. Tests
-__Download the script:__
-```
+remove-item $env:TEMP\get-ipinfo.ps1 -erroraction silentlycontinue  #Clear old copy of script if present
 powershell -exec bypass -c "Invoke-WebRequest https://raw.githubusercontent.com/FiberMoose/gallo/main/get-ipinfo.ps1 -OutFile $env:TEMP\get-ipinfo.ps1"
 ```
+
+### 2. Basic interactive usage
+__Note:__ If the -ip parameter is not provided, you will be prompted for it at execution
+
+From a PowerShell prompt:
+```
+powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1 -ip 1.1.1.1"
+```
+
+### 3. Json-only output mode
+From a PowerShell prompt:
+```
+powershell -exec bypass -c ". \get-ipinfo.ps1 -ip 1.1.1.1 -json"
+```
+
+# Tests
 __Test Normal expected Behavior:__
 ```
 powershell -exec bypass -c ". $env:TEMP\get-ipinfo.ps1"   #Test No parameter
